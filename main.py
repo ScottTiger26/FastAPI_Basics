@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from enum import Enum
 from typing import Optional
 from pydantic import BaseModel
@@ -105,8 +105,9 @@ async def create_item_with_put(item_id: int, item: Item, q : str | None = None):
         result.update({"q": q})
     return result
 
+# Validation
 @app.get("/items")
-async def read_items(q: str | None = None):
+async def read_items(q: str | None = Query(None, max_length=10)):
     result = {"items": [{"item_id": "Foo", "item_id": "Bar"}]}
     if q:
         result.update({"q": q})
