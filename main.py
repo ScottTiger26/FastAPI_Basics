@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from enum import Enum
 from typing import Optional
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -76,3 +77,15 @@ async def get_user_item(user_id: int, item_id: str, q: str | None = None, short:
             }
         )
         return item
+# POST Method
+
+class Item(BaseModel):
+    name: str
+    description: str
+    price: float
+    tax: float
+
+
+@app.post("/items")
+async def create_item():
+    retrun items
