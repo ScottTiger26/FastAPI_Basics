@@ -118,7 +118,27 @@ async def create_item_with_put(item_id: int, item: Item, q: str | None = None):
         result.update({"q": q})
     return result
 
+# To be able to pass multiple queries
+# q: list[str]     <------- Changed
+#     | None = Query(
+#         None,
+#         min_length=3,
+#         max_length=10,
+#         title="Sample query string",
+#         description="This is a sample query string.",
+#         alias="item-query",
+#     )
 
+# To set the default value without None
+# q: str
+#     | None = Query(
+#         ...,          <------- Changed
+#         min_length=3,
+#         max_length=10,
+#         title="Sample query string",
+#         description="This is a sample query string.",
+#         alias="item-query",
+#     )
 @app.get("/items")
 async def read_items(
     q: str
