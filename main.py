@@ -174,41 +174,94 @@
 
 from enum import Enum
 from fastapi import Body, FastAPI, Query, Path
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, HttpUrl
 
 app = FastAPI()
 
 
 # Part-7 - Body Multiple parameters
+# class Item(BaseModel):
+#     name: str
+#     description: str | None = None
+#     price: float
+#     tax: float | None = None
+#
+#
+# class User(BaseModel):
+#     username: str
+#     full_name: str | None = None
+#
+#
+# @app.put("/items/{item_id}")
+# async def update_item(
+#         *,
+#         item_id: int = Path(..., title="The ID of the item to get", ge=10),
+#         q: str | None = None,
+#         item: Item = Body(..., embed=True),
+#         user: User,
+#         importance: int = Body(..., embed=True)
+# ):
+#     results = {"item_id": item_id}
+#
+#     if q:
+#         results.update({"q": q})
+#     if item:
+#         results.update({"item": item})
+#     if user:
+#         results.update({"user": user})
+#     if importance:
+#         results.update({"importance": importance})
+#     return results
+
+## Part 8 -> Body - Fields
+# class Item(BaseModel):
+#     name: str
+#     description: str | None = Field(
+#         None, title="The description of the item", max_length=300
+#     )
+#     price: float = Field(..., gt=0, description="The price must be greater than zero.")
+#     tax: float | None = None
+#
+#
+# @app.put("/items/{item_id}")
+# async def update_item(item_id: int, item: Item = Body(..., embed=True)):
+#     results = {"item_id": item_id, "item": item}
+#     return results
+
+## Part 9 -> Body - Nested Models
+
+class Image(BaseModel):
+    url: HttpUrl
+    name: str
+
 class Item(BaseModel):
     name: str
     description: str | None = None
     price: float
     tax: float | None = None
+    tags: set[str] = []
+    image: list[Image] | None = None
 
-
-class User(BaseModel):
-    username: str
-    full_name: str | None = None
+class Offer(BaseModel):
+    name: str
+    description: str | None = None
+    price: float
+    items: list[Item]
 
 
 @app.put("/items/{item_id}")
-async def update_item(
-        *,
-        item_id: int = Path(..., title="The ID of the item to get", ge=10),
-        q: str | None = None,
-        item: Item = Body(..., embed=True),
-        user: User,
-        importance: int = Body(..., embed=True)
-):
-    results = {"item_id": item_id}
-
-    if q:
-        results.update({"q": q})
-    if item:
-        results.update({"item": item})
-    if user:
-        results.update({"user": user})
-    if importance:
-        results.update({"importance": importance})
+async def update_item(item_id: int, item: Item):
+    results = {"item_id": item_id, "item": item}
     return results
+
+@app.post("/offers")
+async def create_offer(offer: Offer = Body(..., embed=True)):
+    return offer
+
+@app.post("/image/multiple")
+async def create_multiple_images(images: list[Image]):
+    return images
+
+@app.post("/blah")
+async def create_some_blahs(blahs: dict[int, float]):
+    return blahs
